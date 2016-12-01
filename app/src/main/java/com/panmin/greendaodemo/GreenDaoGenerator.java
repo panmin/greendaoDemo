@@ -7,10 +7,10 @@ import org.greenrobot.greendao.generator.Schema;
 import org.greenrobot.greendao.generator.ToMany;
 import org.greenrobot.greendao.generator.ToOne;
 
-
 /**
- * Created by Administrator on 2016/1/11.
+ * Created by panmin on 16-12-1.
  */
+
 public class GreenDaoGenerator {
     public static final int SCHEMA_VERSION = 40;
 
@@ -64,6 +64,4 @@ public class GreenDaoGenerator {
         toOne.setName("father");
         //这样设置完两边就都能点出来了
     }
-
-
 }
