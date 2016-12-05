@@ -94,7 +94,7 @@ public class ExampleInstrumentedTest {
         TableSon cs = ft.get(0);
         Log.d("son",cs.getSon());
         cs.setSon(cs.getSon() + "new");
-        tableSonManager.update(cs);
+        //tableSonManager.update(cs);//不update时，第二次查询也会查询缓存中的值，值是改变了的。
 
         //第二次查询
         List<TableSon> chats = tableSonManager
