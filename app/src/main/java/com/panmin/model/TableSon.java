@@ -24,6 +24,9 @@ public class TableSon {
     @Property(nameInDb = "son")
     private String son;
 
+    @Property(nameInDb = "fatherId")
+    private long fatherId;
+
     /** Used to resolve relations */
     @Generated
     private transient DaoSession daoSession;
@@ -32,7 +35,7 @@ public class TableSon {
     @Generated
     private transient TableSonDao myDao;
 
-    @ToOne(joinProperty = "id")
+    @ToOne(joinProperty = "fatherId")
     private TableFather father;
 
     @Generated
@@ -50,9 +53,10 @@ public class TableSon {
     }
 
     @Generated
-    public TableSon(Long id, String son) {
+    public TableSon(Long id, String son, long fatherId) {
         this.id = id;
         this.son = son;
+        this.fatherId = fatherId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -78,10 +82,18 @@ public class TableSon {
         this.son = son;
     }
 
+    public long getFatherId() {
+        return fatherId;
+    }
+
+    public void setFatherId(long fatherId) {
+        this.fatherId = fatherId;
+    }
+
     /** To-one relationship, resolved on first access. */
     @Generated
     public TableFather getFather() {
-        Long __key = this.id;
+        long __key = this.fatherId;
         if (father__resolvedKey == null || !father__resolvedKey.equals(__key)) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
@@ -98,10 +110,13 @@ public class TableSon {
 
     @Generated
     public void setFather(TableFather father) {
+        if (father == null) {
+            throw new DaoException("To-one property 'fatherId' has not-null constraint; cannot set to-one to null");
+        }
         synchronized (this) {
             this.father = father;
-            id = father == null ? null : father.getId();
-            father__resolvedKey = id;
+            fatherId = father.getId();
+            father__resolvedKey = fatherId;
         }
     }
 

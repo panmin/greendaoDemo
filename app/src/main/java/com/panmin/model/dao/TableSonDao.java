@@ -33,8 +33,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Son = new Property(1, String.class, "son", false, "son");
-        public final static Property Id = new Property(2, Long.class, "id", true, "_id");
-        public final static Property SonId = new Property(3, long.class, "sonId", false, "sonId");
+        public final static Property FatherId = new Property(2, long.class, "fatherId", false, "fatherId");
     };
 
     private DaoSession daoSession;
@@ -56,8 +55,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"TableSon\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"son\" TEXT," + // 1: son
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 2: id
-                "\"sonId\" INTEGER NOT NULL );"); // 3: sonId
+                "\"fatherId\" INTEGER NOT NULL );"); // 2: fatherId
     }
 
     /** Drops the underlying database table. */
@@ -79,6 +77,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
         if (son != null) {
             stmt.bindString(2, son);
         }
+        stmt.bindLong(3, entity.getFatherId());
     }
 
     @Override
@@ -94,6 +93,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
         if (son != null) {
             stmt.bindString(2, son);
         }
+        stmt.bindLong(3, entity.getFatherId());
     }
 
     @Override
@@ -111,7 +111,8 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
     public TableSon readEntity(Cursor cursor, int offset) {
         TableSon entity = new TableSon( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) // son
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // son
+            cursor.getLong(offset + 2) // fatherId
         );
         return entity;
     }
@@ -120,6 +121,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
     public void readEntity(Cursor cursor, TableSon entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setSon(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setFatherId(cursor.getLong(offset + 2));
      }
     
     @Override
@@ -143,16 +145,16 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
     }
     
     /** Internal query to resolve the "fatherList" to-many relationship of TableFather. */
-    public List<TableSon> _queryTableFather_FatherList(long sonId) {
+    public List<TableSon> _queryTableFather_FatherList(long fatherId) {
         synchronized (this) {
             if (tableFather_FatherListQuery == null) {
                 QueryBuilder<TableSon> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.SonId.eq(null));
+                queryBuilder.where(Properties.FatherId.eq(null));
                 tableFather_FatherListQuery = queryBuilder.build();
             }
         }
         Query<TableSon> query = tableFather_FatherListQuery.forCurrentThread();
-        query.setParameter(0, sonId);
+        query.setParameter(0, fatherId);
         return query.list();
     }
 
@@ -165,7 +167,7 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getTableFatherDao().getAllColumns());
             builder.append(" FROM TableSon T");
-            builder.append(" LEFT JOIN TableFather T0 ON T.\"_id\"=T0.\"_id\"");
+            builder.append(" LEFT JOIN TableFather T0 ON T.\"fatherId\"=T0.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -177,7 +179,9 @@ public class TableSonDao extends AbstractDao<TableSon, Long> {
         int offset = getAllColumns().length;
 
         TableFather father = loadCurrentOther(daoSession.getTableFatherDao(), cursor, offset);
-        entity.setFather(father);
+         if(father != null) {
+            entity.setFather(father);
+        }
 
         return entity;    
     }

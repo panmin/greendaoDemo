@@ -24,7 +24,7 @@ greendao-generator是用来生成对象文件的工具包。
  比如服务器给返回的json字符串有不少的字段不必存到本地数据库，但是某些字段还需要使用时，可以在生成的对象类的--keep标记块类写.
  * new DaoGenerator().generateAll(schema, "./app/src/main/java"); 生成代码的总路径
  * 生成Entity，这个要重点说一下：
-    1. 表的主键是Long类型的，设置自动生成autoincrement时必须是Long类型不能是Int类型
+    1. 表的主键是Long类型的，设置自动生成autoincrement时必须是Long类型不能是Int类型，还有一个坑主键不能设置notNull，不然保存时会失败
     2. 因为我一般从服务器获取数据之后会直接转成对象（我的其它github项目上有json工具使用的方式总结），
     服务器上一般都会用id这个名字作为主键，无奈只能定义一个_id作为本地数据库表的主键;
     这里要说下fastjson有个问题以"_"开头的在转换时会被去掉下划线，所以这里用到了greendao的codeBeforeGetterAndSetter，在get和set方法上加上@JSONField(name = "_id")来解决此问题
@@ -54,3 +54,22 @@ greendao-generator是用来生成对象文件的工具包。
 
 
 ### GreenDao缓存
+在DaoMaster中可以看到初始化DaoSession时默认是new DaoSession(db, IdentityScopeType.Session, daoConfigMap);IdentityScopeType.Session就是开启缓存模式了。
+如果传入的是IdentityScopeType.Session，同样的查询只会执行一次，查询结果对象List保存在内存里会重复使用。会导致的问题是如果List对象属性改变，未持久化它，再次做query,不会从数据库查询，只是缓存中的结果。会导致与数据库表数据不一致。
+解决方案：
+1. 再次执行查询之前执行daoSession.clear();方法。
+daoSession.clear()会删除所有表的缓存，那么如何对单表清除缓存呢？这就要用到dao.detachAll()了
+```
+noteDao = daoSession.getNoteDao();
+noteDao.detachAll();
+或者
+note = noteDao.load(key);
+//...如果在这里修改了note的值，后面要update修改时，再次查询只会查询缓存里的数据
+noteDao.detach(note);
+```
+2. 或者在这种情况下之不保留缓存，用IdentityScopeType.None。
+
+### GreenDao进阶
+官方推荐只实例化一个DaoMaster,而且为了方便我们以后切换model模块的底层实现方式，需要抽象一个中间层来连接自己的app和GreenDao。下面我们就来讲到中间层的实现方式。
+* 数据库更新时可能会需要做一些操作，比如清除SharePreference(参考本Demo的MyDBHelper实现)
+* 这个中间层需要实现基本的CRUD(参考本Demo的DBController实现)

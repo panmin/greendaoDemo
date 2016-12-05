@@ -23,9 +23,6 @@ public class TableFather {
     private Long id;
     private String father;
 
-    @Property(nameInDb = "sonId")
-    private long sonId;
-
     /** Used to resolve relations */
     @Generated
     private transient DaoSession daoSession;
@@ -35,7 +32,7 @@ public class TableFather {
     private transient TableFatherDao myDao;
 
     @ToMany(joinProperties = {
-        @JoinProperty(name = "id", referencedName = "sonId")
+        @JoinProperty(name = "id", referencedName = "fatherId")
     })
     private List<TableSon> fatherList;
 
@@ -51,10 +48,9 @@ public class TableFather {
     }
 
     @Generated
-    public TableFather(Long id, String father, long sonId) {
+    public TableFather(Long id, String father) {
         this.id = id;
         this.father = father;
-        this.sonId = sonId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -78,14 +74,6 @@ public class TableFather {
 
     public void setFather(String father) {
         this.father = father;
-    }
-
-    public long getSonId() {
-        return sonId;
-    }
-
-    public void setSonId(long sonId) {
-        this.sonId = sonId;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

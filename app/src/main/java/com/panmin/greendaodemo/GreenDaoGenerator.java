@@ -46,18 +46,18 @@ public class GreenDaoGenerator {
         //主表
         Entity entityTableFather = schema.addEntity("TableFather");
         entityTableFather.setTableName("TableFather");//不设置的话数据库里面都变成大写了
-        Property fatherId = entityTableFather.addIdProperty().autoincrement().getProperty();//这种方式生成的主键实体类中叫id,在数据库文件中是_id
+        entityTableFather.addIdProperty().autoincrement();
         entityTableFather.addStringProperty("father");
-        Property sonId = entityTableFather.addLongProperty("sonId").columnName("sonId").notNull().getProperty();//外键Id
 
         //子表
         Entity entityTableSon = schema.addEntity("TableSon");
         entityTableSon.setTableName("TableSon");
         entityTableSon.addIdProperty().autoincrement();//子表Id
         entityTableSon.addStringProperty("son").columnName("son");
+        Property fatherId = entityTableSon.addLongProperty("fatherId").columnName("fatherId").notNull().getProperty();//这种方式生成的主键实体类中叫id,在数据库文件中是_id
 
         //设置外键关系
-        ToMany toMany = entityTableFather.addToMany(entityTableSon, sonId);
+        ToMany toMany = entityTableFather.addToMany(entityTableSon, fatherId);
         toMany.setName("fatherList");
 
         ToOne toOne = entityTableSon.addToOne(entityTableFather,fatherId);

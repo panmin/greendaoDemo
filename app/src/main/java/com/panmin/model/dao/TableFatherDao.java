@@ -26,7 +26,6 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Father = new Property(1, String.class, "father", false, "FATHER");
-        public final static Property SonId = new Property(2, long.class, "sonId", false, "sonId");
     };
 
     private DaoSession daoSession;
@@ -46,8 +45,7 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"TableFather\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"FATHER\" TEXT," + // 1: father
-                "\"sonId\" INTEGER NOT NULL );"); // 2: sonId
+                "\"FATHER\" TEXT);"); // 1: father
     }
 
     /** Drops the underlying database table. */
@@ -69,7 +67,6 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
         if (father != null) {
             stmt.bindString(2, father);
         }
-        stmt.bindLong(3, entity.getSonId());
     }
 
     @Override
@@ -85,7 +82,6 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
         if (father != null) {
             stmt.bindString(2, father);
         }
-        stmt.bindLong(3, entity.getSonId());
     }
 
     @Override
@@ -103,8 +99,7 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
     public TableFather readEntity(Cursor cursor, int offset) {
         TableFather entity = new TableFather( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // father
-            cursor.getLong(offset + 2) // sonId
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) // father
         );
         return entity;
     }
@@ -113,7 +108,6 @@ public class TableFatherDao extends AbstractDao<TableFather, Long> {
     public void readEntity(Cursor cursor, TableFather entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setFather(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setSonId(cursor.getLong(offset + 2));
      }
     
     @Override

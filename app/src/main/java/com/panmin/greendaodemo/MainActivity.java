@@ -5,10 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.panmin.model.TaskCall;
-
-import java.util.Date;
-
 public class MainActivity extends AppCompatActivity{
 
     private Button btn_save_data;
@@ -29,10 +25,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void saveData(){
-        TaskCall taskCall = new TaskCall();
-        taskCall.setId("idididididididid");
-        taskCall.setCreateTime(new Date().getTime());
-        taskCall.setRemarks("oldRemark");
+
 
     }
 }
